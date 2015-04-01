@@ -146,16 +146,16 @@
 	<parent link="base"/>
 	<child link="neck"/>
 	<axis xyz="0 0 1"/>
-	<limit lower="-1.5707963" upper="1.5707963" effort="10" velocity="30"/>
+	<limit lower="-1.5707963" upper="1.5707963" effort="1000" velocity="1"/>
 </joint>
 
 <transmission name="transmission">
 	<type>transmission_interface/SimpleTransmission</type>
 	<joint name="neck_to_base">
-		<hardwareInterface>EffortJointInterface</hardwareInterface>
+		<hardwareInterface>PositionJointInterface</hardwareInterface>
 	</joint>
 	<actuator name="neck_actuator">
-		<hardwareInterface>EffortJointInterface</hardwareInterface>
+		<hardwareInterface>PositionJointInterface</hardwareInterface>
 		<mechanicalReduction>1</mechanicalReduction>
 	</actuator>
 </transmission>

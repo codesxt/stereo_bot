@@ -4,8 +4,8 @@ stereo_bot:
     type: joint_state_controller/JointStateController
     publish_rate: 50  
 
-  # Position Controllers ---------------------------------------
-  neck_effort_controller:
-    type: effort_controllers/JointEffortController
+  # Position Controllers (This allows to control the neck as if it was connected to a servo)
+  neck_position_controller:
+    type: position_controllers/JointPositionController
     joint: neck_to_base
     pid: {p: 100.0, i: 0.01, d: 10.0}
