@@ -4,5 +4,3 @@
 The cameras can be customized in the file `stereo_bot_description/stereo_bot.gazebo`. They are published on the topics
 * `/stereo_bot/camera_l/image_raw`
 * `/stereo_bot/camera_r/image_raw`
-
-The head of `stereo_bot` is fixed to the neck. The neck can rotate from -PI/2 to PI/2 as a revolute joint.
