@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="gui" default="True" />
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(find stereo_bot_gazebo)/worlds/stereo_bot.world"/>
+	</include>
+
+	<param name="use_gui" value="$(arg gui)"/>
+
+	<!-- Convierte la descripción en xacro a urdf y la publica en el servidor de parámetros -->
+	<param name="robot_description" command="$(find xacro)/xacro.py $(find stereo_bot_description)/urdf/stereo_bot.xacro" />
+
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+
+   	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+
+   	<!-- Carga en Gazebo el robot publicado en el servidor de parámetros -->
+	<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model stereo_bot" />	
+
+	<!-- Abre Rviz con el archivo de configuración personalizado -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find stereo_bot_control)/rviz/config.rviz"/>
+</launch>

@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<robot name="stereo_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:include filename="$(find stereo_bot_description)/materials/materials.xacro" />
+<xacro:include filename="$(find stereo_bot_description)/urdf/stereo_bot.gazebo" />
+<xacro:include filename="$(find stereo_bot_description)/macros/macros.xacro" />
+
+<xacro:property name="base_radius" value=".07"/>
+<xacro:property name="base_height" value=".05"/>
+<xacro:property name="base_mass" value="0.2"/>
+
+<xacro:property name="neck_radius" value=".01"/>
+<xacro:property name="neck_height" value=".15"/>
+<xacro:property name="neck_mass" value=".1"/>
+
+<xacro:property name="head_height" value=".05"/>
+<xacro:property name="head_length" value="0.02"/>
+<xacro:property name="head_width" value="0.12"/>
+<xacro:property name="head_mass" value="0.2"/>
+
+<xacro:property name="camera_size" value="0.03"/>
+<xacro:property name="camera_mass" value="0.01"/>
+
+<link name="base_link"/>
+
+<joint name="base_joint" type="fixed">
+	<parent link="base_link"/>
+	<child link="base"/>
+</joint>
+
+<link name="base">
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder length="${base_height}" radius="${base_radius}"/>
+		</geometry>
+	</collision>
+	
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder length="${base_height}" radius="${base_radius}"/>
+		</geometry>
+		<material name="orange"/>
+	</visual>
+	
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="${base_mass}"/>
+		<cylinder_inertia m="${base_mass}" r="${base_radius}" h="${base_height}"/>
+	</inertial>
+</link>
+
+<link name="neck">
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder length="${neck_height}" radius="${neck_radius}"/>
+		</geometry>
+	</collision>
+
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder length="${neck_height}" radius="${neck_radius}"/>
+		</geometry>
+		<material name="orange"/>
+	</visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="${neck_mass}"/>
+		<cylinder_inertia m="${neck_mass}" r="${neck_radius}" h="${neck_height}"/>
+	</inertial>
+</link>
+
+<link name="head">
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${head_length} ${head_width} ${head_height}"/>
+		</geometry>
+	</collision>
+
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${head_length} ${head_width} ${head_height}"/>
+		</geometry>
+	</visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="${head_mass}"/>
+		<box_inertia m="${head_mass}" x="${head_length}" y="${head_width}" z="${head_height}"/>
+	</inertial>
+</link>
+
+<link name="camera_l">
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${camera_size} ${camera_size} ${camera_size}"/>
+		</geometry>
+	</collision>
+
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${camera_size} ${camera_size} ${camera_size}"/>
+		</geometry>
+		<material name="blue"/>
+	</visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="${camera_mass}"/>
+		<box_inertia m="${camera_mass}" x="${camera_size}" y="${camera_size}" z="${camera_size}"/>
+	</inertial>
+</link>
+
+<link name="camera_r">
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${camera_size} ${camera_size} ${camera_size}"/>
+		</geometry>
+	</collision>
+
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="${camera_size} ${camera_size} ${camera_size}"/>
+		</geometry>
+		<material name="blue"/>
+	</visual>
+
+	<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="${camera_mass}"/>
+		<box_inertia m="${camera_mass}" x="${camera_size}" y="${camera_size}" z="${camera_size}"/>
+	</inertial>
+</link>
+
+<joint name="neck_to_base" type="revolute">
+	<origin xyz="0 0 ${(neck_height+base_height)/2}" rpy="0 0 0"/>
+	<parent link="base"/>
+	<child link="neck"/>
+	<axis xyz="0 0 1"/>
+	<limit lower="-1.5707963" upper="1.5707963" effort="10" velocity="30"/>
+</joint>
+
+<transmission name="transmission">
+	<type>transmission_interface/SimpleTransmission</type>
+	<joint name="neck_to_base">
+		<hardwareInterface>EffortJointInterface</hardwareInterface>
+	</joint>
+	<actuator name="neck_actuator">
+		<hardwareInterface>EffortJointInterface</hardwareInterface>
+		<mechanicalReduction>1</mechanicalReduction>
+	</actuator>
+</transmission>
+
+<joint name="head_to_neck" type="fixed">
+	<origin xyz="${neck_radius} 0 ${neck_height/2}" rpy="0 0 0"/>
+	<parent link="neck"/>
+	<child link="head"/>
+	<axis xyz="0 0 0"/>
+</joint>
+
+<joint name="camera_l_to_head" type="fixed">
+	<origin xyz="${head_length/2} ${head_width/4} 0" rpy="0 0 0"/>
+	<child link="camera_l"/>
+	<parent link="head"/>
+	<axis xyz="0 1 0"/>
+</joint>
+
+<joint name="camera_r_to_head" type="fixed">
+	<origin xyz="${head_length/2} -${head_width/4} 0" rpy="0 0 0"/>
+	<child link="camera_r"/>
+	<parent link="head"/>
+	<axis xyz="0 1 0"/>
+</joint>
+
+</robot>
